@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex">
+<title>Have Funs</title>
+<style>
+  :root{
+    --gold:#f5a623; --amber:#ff8a00; --indigo:#4f46e5; --indigo2:#6d5efc;
+    --ink:#1f2937; --muted:#6b7280; --card:#ffffff; --line:#eceaf3;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{
+    font-family:'Segoe UI',Arial,sans-serif; color:var(--ink); min-height:100vh;
+    background:linear-gradient(135deg,#f5f7ff 0%,#fdf6e9 100%);
+    padding:30px 16px 60px;
+  }
+  .wrap{max-width:1080px;margin:0 auto}
+  .head{text-align:center;margin-bottom:8px}
+  .logo{font-size:28px;font-weight:800;color:var(--ink);display:inline-flex;align-items:center;gap:10px}
+  .logo .coin{width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,var(--gold),var(--amber));display:inline-flex;align-items:center;justify-content:center;color:#fff;font-size:20px;font-weight:800;box-shadow:0 4px 12px rgba(245,166,35,.4)}
+  .sub{color:var(--muted);font-size:16px;margin-top:8px}
+  .notice{display:none;margin:18px auto 0;max-width:560px;border-radius:14px;padding:16px;text-align:center;font-size:15px}
+  .notice.info{background:#eef0ff;border:1px solid #cfd4ff;color:#3a3f8f}
+  .notice.warn{background:#fff7e6;border:1px solid #ffd98a;color:#8a5a00}
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:16px;margin-top:26px}
+  .card{position:relative;background:var(--card);border:2px solid var(--line);border-radius:20px;padding:28px 18px 22px;text-align:center;box-shadow:0 8px 26px rgba(79,70,229,.07);transition:transform .15s,box-shadow .15s,border-color .15s}
+  .card:hover{transform:translateY(-4px);box-shadow:0 14px 34px rgba(245,166,35,.18)}
+  .card.feat{border-color:var(--gold);transform:scale(1.04)}
+  .card.feat:hover{transform:scale(1.04) translateY(-4px)}
+  .card.sel{border-color:var(--indigo);box-shadow:0 0 0 4px rgba(79,70,229,.16)}
+  .badge{position:absolute;top:-12px;left:50%;transform:translateX(-50%);background:var(--indigo);color:#fff;font-size:12px;font-weight:700;padding:5px 14px;border-radius:999px;white-space:nowrap;box-shadow:0 4px 10px rgba(79,70,229,.3)}
+  .badge.gold{background:linear-gradient(90deg,var(--gold),var(--amber))}
+  .pname{font-size:18px;font-weight:800;margin-bottom:14px;color:var(--muted)}
+  .coins{font-size:36px;font-weight:800;color:var(--ink);line-height:1}
+  .coins .ic{color:var(--gold)}
+  .coins small{font-size:15px;color:var(--muted);font-weight:700}
+  .bonus{display:inline-block;margin-top:10px;background:#fff4d6;color:#9a6700;font-size:13px;font-weight:700;padding:4px 10px;border-radius:999px}
+  .price{margin:18px 0 18px;font-size:27px;font-weight:800}
+  .price .cur{font-size:18px;color:var(--muted)}
+  .buy{width:100%;border:none;cursor:pointer;background:linear-gradient(90deg,var(--indigo),var(--indigo2));color:#fff;font-size:16px;font-weight:800;padding:13px;border-radius:12px;transition:opacity .15s}
+  .buy:hover{opacity:.92}
+  .buy:disabled{opacity:.6;cursor:default}
+  .foot{text-align:center;margin-top:30px;color:var(--muted);font-size:13px;line-height:1.9}
+  .foot .lock{font-size:15px}
+  .overlay{display:none;position:fixed;inset:0;background:rgba(255,255,255,.93);z-index:50;flex-direction:column;align-items:center;justify-content:center;gap:18px}
+  .spin{width:46px;height:46px;border:4px solid #eee2c4;border-top-color:var(--gold);border-radius:50%;animation:sp 1s linear infinite}
+  @keyframes sp{to{transform:rotate(360deg)}}
+  .overlay p{font-weight:700;color:var(--ink)}
+  .err{display:none;margin:16px auto 0;max-width:560px;background:#fde8e8;border:1px solid #f5b5b5;color:#a12020;border-radius:12px;padding:12px 16px;text-align:center;font-size:14px}
+  .done{display:none;max-width:520px;margin:50px auto 0;background:#fff;border:1px solid var(--line);border-radius:22px;padding:40px 28px;text-align:center;box-shadow:0 10px 30px rgba(79,70,229,.1)}
+  .done .ok{width:74px;height:74px;border-radius:50%;background:linear-gradient(135deg,#34d399,#10b981);display:inline-flex;align-items:center;justify-content:center;color:#fff;font-size:40px;margin-bottom:16px}
+  .done h2{font-size:24px;margin-bottom:8px}
+  .done p{color:var(--muted);font-size:16px}
+  .foot a{color:var(--indigo);text-decoration:none;cursor:pointer}
+  .foot .links{margin-top:10px}
+  .foot .links a{margin:0 5px}
+  .foot .cards{margin-top:8px;font-size:12px;letter-spacing:.3px;color:var(--muted)}
+  .foot .biz{margin-top:8px;font-size:12px}
+  .modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:60;align-items:center;justify-content:center;padding:16px}
+  .modal.open{display:flex}
+  .modal .box{background:#fff;max-width:560px;width:100%;max-height:85vh;overflow:auto;border-radius:18px;padding:26px 24px;text-align:right;box-shadow:0 20px 50px rgba(0,0,0,.25)}
+  .modal h3{font-size:20px;margin-bottom:14px;color:var(--ink)}
+  .modal p{color:#444;font-size:14px;line-height:1.85;margin-bottom:10px}
+  .modal a{color:var(--indigo)}
+  .modal .x{float:left;cursor:pointer;border:none;background:#f0f0f4;border-radius:8px;width:32px;height:32px;font-size:18px;color:#555;line-height:1}
+</style>
+</head>
+<body>
+  <div class="overlay" id="overlay"><div class="spin"></div><p>מעביר אותך לתשלום מאובטח...</p></div>
+
+  <div class="done" id="done">
+    <div class="ok">&#10003;</div>
+    <h2>התשלום הושלם!</h2>
+    <p>המטבעות נטענו לחשבונך. אפשר לחזור לאפליקציה ולהמשיך.</p>
+  </div>
+
+  <div class="wrap" id="store">
+    <div class="head">
+      <div class="logo"><span class="coin">&#9786;</span>Have Funs</div>
+      <div class="sub">מטבעות דיגיטליים לשימוש בשירות Have Funs &mdash; ייטענו לחשבונך מיד לאחר התשלום</div>
+    </div>
+
+    <div class="notice warn" id="canceled">התשלום בוטל. אפשר לנסות שוב מתי שתרצה.</div>
+    <div class="err" id="err"></div>
+    <div class="notice info" id="needtoken">כדי לטעון מטבעות יש לפתוח עמוד זה דרך החשבון שלך.</div>
+
+    <div class="grid">
+      <div class="card" data-pkg="1">
+        <div class="pname">טעימה</div>
+        <div class="coins"><span class="ic">&#9679;</span> 275 <small>מטבעות</small></div>
+        <div class="bonus">250 + 25 בונוס</div>
+        <div class="price"><span class="cur">&#8362;</span>25</div>
+        <button class="buy" onclick="buy('1',this)">רכישה</button>
+      </div>
+
+      <div class="card" data-pkg="2">
+        <div class="pname">בסיס</div>
+        <div class="coins"><span class="ic">&#9679;</span> 775 <small>מטבעות</small></div>
+        <div class="bonus">750 + 25 בונוס</div>
+        <div class="price"><span class="cur">&#8362;</span>49</div>
+        <button class="buy" onclick="buy('2',this)">רכישה</button>
+      </div>
+
+      <div class="card feat" data-pkg="3">
+        <div class="badge">הכי פופולרי</div>
+        <div class="pname">התחלה</div>
+        <div class="coins"><span class="ic">&#9679;</span> 1,825 <small>מטבעות</small></div>
+        <div class="bonus">1,750 + 75 בונוס</div>
+        <div class="price"><span class="cur">&#8362;</span>85</div>
+        <button class="buy" onclick="buy('3',this)">רכישה</button>
+      </div>
+
+      <div class="card" data-pkg="4">
+        <div class="pname">פרימיום</div>
+        <div class="coins"><span class="ic">&#9679;</span> 4,375 <small>מטבעות</small></div>
+        <div class="bonus">4,250 + 125 בונוס</div>
+        <div class="price"><span class="cur">&#8362;</span>180</div>
+        <button class="buy" onclick="buy('4',this)">רכישה</button>
+      </div>
+
+      <div class="card" data-pkg="5">
+        <div class="badge gold">הכי משתלם</div>
+        <div class="pname">VIP</div>
+        <div class="coins"><span class="ic">&#9679;</span> 9,675 <small>מטבעות</small></div>
+        <div class="bonus">9,500 + 175 בונוס</div>
+        <div class="price"><span class="cur">&#8362;</span>360</div>
+        <button class="buy" onclick="buy('5',this)">רכישה</button>
+      </div>
+    </div>
+
+    <div class="foot">
+      <div class="lock">&#128274; תשלום מאובטח ותקני PCI דרך Stripe</div>
+      <div class="cards">Visa &middot; Mastercard &middot; American Express &middot; Apple Pay</div>
+      <div class="links">
+        <a onclick="openM('m-contact')">יצירת קשר</a>&middot;
+        <a onclick="openM('m-refund')">מדיניות החזרים</a>&middot;
+        <a onclick="openM('m-privacy')">מדיניות פרטיות</a>&middot;
+        <a onclick="openM('m-terms')">תנאי שימוש</a>
+      </div>
+      <div class="biz">Have Funs &mdash; ronel avraham &middot; <a href="mailto:ronel112233@icloud.com">ronel112233@icloud.com</a> &middot; מחירים ב-&#8362; (ILS)</div>
+    </div>
+  </div>
+
+  <div class="modal" id="m-contact"><div class="box"><button class="x" onclick="closeM('m-contact')">&times;</button><h3>יצירת קשר</h3><p>Have Funs &mdash; ronel avraham</p><p>דוא&#1452;ל לתמיכה: <a href="mailto:ronel112233@icloud.com">ronel112233@icloud.com</a></p><p>נשמח לעזור בכל שאלה בנוגע לרכישה, טעינת מטבעות או החזרים &mdash; נחזור אליך תוך יום עסקים אחד.</p></div></div>
+
+  <div class="modal" id="m-refund"><div class="box"><button class="x" onclick="closeM('m-refund')">&times;</button><h3>מדיניות החזרים וביטול עסקה</h3><p>המטבעות הם מוצר דיגיטלי הנטען לחשבונך באופן מיידי עם אישור התשלום.</p><p>בהתאם לחוק הגנת הצרכן, ניתן לבטל עסקה ולקבל החזר מלא תוך 14 יום מהרכישה, כל עוד המטבעות שנרכשו לא נוצלו (במלואם או בחלקם). לאחר ניצול המטבעות, או בחלוף 14 יום, לא יינתן החזר.</p><p>במקרה של חיוב שגוי או תקלה טכנית נחזיר את מלוא הסכום. לבקשת ביטול או החזר פנה אלינו לדוא&#1452;ל <a href="mailto:ronel112233@icloud.com">ronel112233@icloud.com</a> ונטפל בפנייה תוך עד 14 ימי עסקים.</p></div></div>
+
+  <div class="modal" id="m-privacy"><div class="box"><button class="x" onclick="closeM('m-privacy')">&times;</button><h3>מדיניות פרטיות</h3><p>אנו אוספים אך ורק את המידע הדרוש לביצוע התשלום וטעינת המטבעות לחשבונך &mdash; מזהה החשבון ופרטי העסקה.</p><p>פרטי כרטיס האשראי מעובדים ומאובטחים ישירות אצל ספק הסליקה Stripe (תקן PCI-DSS) ואינם נשמרים אצלנו.</p><p>איננו מוכרים ואיננו משתפים את פרטיך עם צדדים שלישיים, למעט לצורך עיבוד התשלום או כנדרש על פי חוק. לשאלות בנושא פרטיות: <a href="mailto:ronel112233@icloud.com">ronel112233@icloud.com</a>.</p></div></div>
+
+  <div class="modal" id="m-terms"><div class="box"><button class="x" onclick="closeM('m-terms')">&times;</button><h3>תנאי שימוש</h3><p>רכישת מטבעות מהווה הסכמה לתנאים אלה.</p><p>המטבעות הם אמצעי דיגיטלי לשימוש בשירות Have Funs בלבד, אינם ניתנים להמרה לכסף ואינם מהווים אמצעי תשלום מחוץ לשירות.</p><p>המחירים נקובים בשקלים חדשים (&#8362; / ILS) וכוללים מע&#1452;מ כחוק. אספקת המטבעות מתבצעת מיידית עם אישור התשלום.</p></div></div>
+
+<script>
+  var ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5mdGlpcXJibnZzdWVoamhpZHp5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk0Nzk4OTMsImV4cCI6MjA5NTA1NTg5M30.tY9_IQKSCvrp6m8hVaYxJdppTWLHMrmnHC7d0514Ubc';
+  var API = 'https://nftiiqrbnvsuehjhidzy.supabase.co/functions/v1/stripe-checkout';
+
+  function openM(id){ var m = document.getElementById(id); if(m){ m.classList.add('open'); } }
+  function closeM(id){ var m = document.getElementById(id); if(m){ m.classList.remove('open'); } }
+
+  function qp(name){ var m = new RegExp('[?&]' + name + '=([^&]+)').exec(location.search); return m ? decodeURIComponent(m[1].replace(/\+/g,' ')) : ''; }
+  function hp(name){ var m = new RegExp('[#&]' + name + '=([^&]+)').exec(location.hash); return m ? decodeURIComponent(m[1]) : ''; }
+
+  // payment result screens
+  if(qp('paid') === '1'){
+    document.getElementById('store').style.display = 'none';
+    document.getElementById('done').style.display = 'block';
+  }
+
+  var TOKEN = qp('token') || hp('token') || '';
+  if(!TOKEN){
+    try{
+      TOKEN = localStorage.getItem('lm_token') || localStorage.getItem('token') || localStorage.getItem('cl_token') || '';
+      if(!TOKEN){ var raw = localStorage.getItem('lm_auth') || localStorage.getItem('auth') || ''; if(raw){ var o = JSON.parse(raw); TOKEN = (o && o.token) ? o.token : ''; } }
+    }catch(e){}
+  }
+
+  var PKG = qp('pkg');
+
+  function showErr(msg){ var e = document.getElementById('err'); e.textContent = msg; e.style.display = 'block'; }
+  function hideErr(){ document.getElementById('err').style.display = 'none'; }
+
+  function errMsg(d){
+    var c = d && d.error ? d.error : '';
+    if(c === 'unauthorized') return 'פג תוקף הגישה. פתח את העמוד מחדש דרך החשבון שלך.';
+    if(c === 'bad_package') return 'חבילה לא תקינה.';
+    return 'אירעה שגיאה. נסה שוב בעוד רגע.';
+  }
+
+  function buy(pkgId, btn){
+    hideErr();
+    if(!TOKEN){ document.getElementById('needtoken').style.display = 'block'; window.scrollTo(0,0); return; }
+    if(btn){ btn.disabled = true; btn.dataset.old = btn.textContent; btn.textContent = 'מעבד...'; }
+    fetch(API, {
+      method: 'POST',
+      headers: { 'Content-Type':'application/json', 'apikey': ANON, 'Authorization': 'Bearer ' + ANON },
+      body: JSON.stringify({ token: TOKEN, pkg_id: String(pkgId) })
+    })
+    .then(function(r){ return r.json().then(function(d){ return { ok: r.ok, d: d }; }); })
+    .then(function(res){
+      if(res.d && res.d.url){ document.getElementById('overlay').style.display = 'flex'; location.href = res.d.url; return; }
+      showErr(errMsg(res.d));
+      if(res.d && res.d.error === 'unauthorized'){ document.getElementById('needtoken').style.display = 'block'; }
+      if(btn){ btn.disabled = false; btn.textContent = btn.dataset.old || 'רכישה'; }
+    })
+    .catch(function(){
+      showErr('שגיאת רשת. בדוק את החיבור ונסה שוב.');
+      if(btn){ btn.disabled = false; btn.textContent = btn.dataset.old || 'רכישה'; }
+    });
+  }
+
+  if(qp('canceled') === '1'){ document.getElementById('canceled').style.display = 'block'; }
+
+  // highlight a pre-selected package and, if identified, go straight to payment
+  if(PKG && /^[1-5]$/.test(PKG) && qp('paid') !== '1'){
+    var card = document.querySelector('.card[data-pkg="' + PKG + '"]');
+    if(card){ card.classList.add('sel'); }
+    if(TOKEN){ document.getElementById('overlay').style.display = 'flex'; buy(PKG, null); }
+  }
+
+  if(!TOKEN && qp('paid') !== '1'){ document.getElementById('needtoken').style.display = 'block'; }
+</script>
+</body>
+</html>
