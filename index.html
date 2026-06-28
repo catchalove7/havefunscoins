@@ -88,6 +88,13 @@
     <div class="notice info" id="needtoken">כדי לטעון מטבעות יש לפתוח עמוד זה דרך החשבון שלך.</div>
 
     <div class="grid">
+      <div class="card" data-pkg="6">
+        <div class="pname">מיני</div>
+        <div class="coins"><span class="ic">&#9679;</span> 150 <small>מטבעות</small></div>
+        <div class="price"><span class="cur">&#8362;</span>15</div>
+        <button class="buy" onclick="buy('6',this)">רכישה</button>
+      </div>
+
       <div class="card" data-pkg="1">
         <div class="pname">טעימה</div>
         <div class="coins"><span class="ic">&#9679;</span> 275 <small>מטבעות</small></div>
@@ -213,7 +220,7 @@
   if(qp('canceled') === '1'){ document.getElementById('canceled').style.display = 'block'; }
 
   // highlight a pre-selected package and, if identified, go straight to payment
-  if(PKG && /^[1-5]$/.test(PKG) && qp('paid') !== '1'){
+  if(PKG && /^[1-6]$/.test(PKG) && qp('paid') !== '1'){
     var card = document.querySelector('.card[data-pkg="' + PKG + '"]');
     if(card){ card.classList.add('sel'); }
     if(TOKEN){ document.getElementById('overlay').style.display = 'flex'; buy(PKG, null); }
