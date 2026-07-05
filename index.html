@@ -88,13 +88,6 @@
     <div class="notice info" id="needtoken">כדי לטעון מטבעות יש לפתוח עמוד זה דרך החשבון שלך.</div>
 
     <div class="grid">
-      <div class="card" data-pkg="6">
-        <div class="pname">מיני</div>
-        <div class="coins"><span class="ic">&#9679;</span> 150 <small>מטבעות</small></div>
-        <div class="price"><span class="cur">&#8362;</span>15</div>
-        <button class="buy" onclick="buy('6',this)">רכישה</button>
-      </div>
-
       <div class="card" data-pkg="1">
         <div class="pname">טעימה</div>
         <div class="coins"><span class="ic">&#9679;</span> 275 <small>מטבעות</small></div>
@@ -111,7 +104,8 @@
         <button class="buy" onclick="buy('2',this)">רכישה</button>
       </div>
 
-      <div class="card" data-pkg="3">
+      <div class="card feat" data-pkg="3">
+        <div class="badge">הכי פופולרי</div>
         <div class="pname">התחלה</div>
         <div class="coins"><span class="ic">&#9679;</span> 1,825 <small>מטבעות</small></div>
         <div class="bonus">1,750 + 75 בונוס</div>
@@ -119,9 +113,8 @@
         <button class="buy" onclick="buy('3',this)">רכישה</button>
       </div>
 
-      <div class="card feat" data-pkg="4">
-        <div class="badge">הכי פופולרי</div>
-        <div class="pname">הכי משתלם</div>
+      <div class="card" data-pkg="4">
+        <div class="pname">פרימיום</div>
         <div class="coins"><span class="ic">&#9679;</span> 4,375 <small>מטבעות</small></div>
         <div class="bonus">4,250 + 125 בונוס</div>
         <div class="price"><span class="cur">&#8362;</span>180</div>
@@ -129,7 +122,8 @@
       </div>
 
       <div class="card" data-pkg="5">
-        <div class="pname">פרימיום</div>
+        <div class="badge gold">הכי משתלם</div>
+        <div class="pname">VIP</div>
         <div class="coins"><span class="ic">&#9679;</span> 9,675 <small>מטבעות</small></div>
         <div class="bonus">9,500 + 175 בונוס</div>
         <div class="price"><span class="cur">&#8362;</span>360</div>
@@ -219,10 +213,31 @@
   if(qp('canceled') === '1'){ document.getElementById('canceled').style.display = 'block'; }
 
   // highlight a pre-selected package and, if identified, go straight to payment
-  if(PKG && /^[1-6]$/.test(PKG) && qp('paid') !== '1'){
+  if(PKG && /^[1-5]$/.test(PKG) && qp('paid') !== '1'){
     var card = document.querySelector('.card[data-pkg="' + PKG + '"]');
     if(card){ card.classList.add('sel'); }
     if(TOKEN){ document.getElementById('overlay').style.display = 'flex'; buy(PKG, null); }
+  }
+
+  // If this user has a custom (rotating) amount for the "התחלה" package, reflect it in the card so what's shown == what's charged.
+  if(TOKEN && qp('paid') !== '1'){
+    fetch(API, { method:'POST', headers:{ 'Content-Type':'application/json', 'apikey': ANON, 'Authorization': 'Bearer ' + ANON }, body: JSON.stringify({ token: TOKEN, info: 1 }) })
+      .then(function(r){ return r.json(); })
+      .then(function(d){
+        if(!d || !d.pkg3) return;
+        var ils = Number(d.pkg3.ils), credits = Number(d.pkg3.credits);
+        if(!(ils > 0) || !(credits > 0)) return;
+        if(ils === 85 && credits === 1825) return; // default package — leave the card exactly as-is
+        var card = document.querySelector('.card[data-pkg="3"]');
+        if(!card) return;
+        var coins = card.querySelector('.coins');
+        if(coins){ coins.innerHTML = '<span class="ic">&#9679;</span> ' + credits.toLocaleString('en-US') + ' <small>מטבעות</small>'; }
+        var price = card.querySelector('.price');
+        if(price){ price.innerHTML = '<span class="cur">&#8362;</span>' + ils; }
+        var bonus = card.querySelector('.bonus');
+        if(bonus){ bonus.style.display = 'none'; }
+      })
+      .catch(function(){});
   }
 
   if(!TOKEN && qp('paid') !== '1'){ document.getElementById('needtoken').style.display = 'block'; }
