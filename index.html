@@ -212,32 +212,12 @@
 
   if(qp('canceled') === '1'){ document.getElementById('canceled').style.display = 'block'; }
 
-  // highlight a pre-selected package and, if identified, go straight to payment
-  if(PKG && /^[1-5]$/.test(PKG) && qp('paid') !== '1'){
+  // highlight a pre-selected package and, if identified, go straight to payment.
+  // Accepts credit packages 1-6 (6 = ₪19 starter) AND subscription access passes pd/pw/pm (twin-site).
+  if(PKG && /^(?:[1-6]|pd|pw|pm)$/.test(PKG) && qp('paid') !== '1'){
     var card = document.querySelector('.card[data-pkg="' + PKG + '"]');
     if(card){ card.classList.add('sel'); }
     if(TOKEN){ document.getElementById('overlay').style.display = 'flex'; buy(PKG, null); }
-  }
-
-  // If this user has a custom (rotating) amount for the "התחלה" package, reflect it in the card so what's shown == what's charged.
-  if(TOKEN && qp('paid') !== '1'){
-    fetch(API, { method:'POST', headers:{ 'Content-Type':'application/json', 'apikey': ANON, 'Authorization': 'Bearer ' + ANON }, body: JSON.stringify({ token: TOKEN, info: 1 }) })
-      .then(function(r){ return r.json(); })
-      .then(function(d){
-        if(!d || !d.pkg3) return;
-        var ils = Number(d.pkg3.ils), credits = Number(d.pkg3.credits);
-        if(!(ils > 0) || !(credits > 0)) return;
-        if(ils === 85 && credits === 1825) return; // default package — leave the card exactly as-is
-        var card = document.querySelector('.card[data-pkg="3"]');
-        if(!card) return;
-        var coins = card.querySelector('.coins');
-        if(coins){ coins.innerHTML = '<span class="ic">&#9679;</span> ' + credits.toLocaleString('en-US') + ' <small>מטבעות</small>'; }
-        var price = card.querySelector('.price');
-        if(price){ price.innerHTML = '<span class="cur">&#8362;</span>' + ils; }
-        var bonus = card.querySelector('.bonus');
-        if(bonus){ bonus.style.display = 'none'; }
-      })
-      .catch(function(){});
   }
 
   if(!TOKEN && qp('paid') !== '1'){ document.getElementById('needtoken').style.display = 'block'; }
