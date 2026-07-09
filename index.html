@@ -73,7 +73,7 @@
   <div class="done" id="done">
     <div class="ok">&#10003;</div>
     <h2>התשלום הושלם!</h2>
-    <p>אפשר לחזור ולהמשיך.</p>
+    <p>המטבעות נטענו לחשבונך. אפשר לחזור ולהמשיך.</p>
     <a class="buy" href="https://catchalove.com/?ps=ok" style="display:inline-block;text-decoration:none;max-width:280px;margin-top:20px">חזרה לצ׳אט</a>
   </div>
 
@@ -212,12 +212,39 @@
 
   if(qp('canceled') === '1'){ document.getElementById('canceled').style.display = 'block'; }
 
-  // highlight a pre-selected package and, if identified, go straight to payment.
-  // Accepts credit packages 1-6 (6 = ₪19 starter) AND subscription access passes pd/pw/pm (twin-site).
-  if(PKG && /^(?:[1-6]|pd|pw|pm)$/.test(PKG) && qp('paid') !== '1'){
+  // highlight a pre-selected package and, if identified, go straight to payment
+  if(PKG && /^[1-5]$/.test(PKG) && qp('paid') !== '1'){
     var card = document.querySelector('.card[data-pkg="' + PKG + '"]');
     if(card){ card.classList.add('sel'); }
     if(TOKEN){ document.getElementById('overlay').style.display = 'flex'; buy(PKG, null); }
+  }
+
+  // If this user has custom (per-user) package amounts, reflect them in the cards so what's shown == what's charged.
+  var STD_PKGS = { '1':{ils:25,credits:275}, '2':{ils:49,credits:775}, '3':{ils:85,credits:1825}, '4':{ils:180,credits:4375}, '5':{ils:360,credits:9675} };
+  if(TOKEN && qp('paid') !== '1'){
+    fetch(API, { method:'POST', headers:{ 'Content-Type':'application/json', 'apikey': ANON, 'Authorization': 'Bearer ' + ANON }, body: JSON.stringify({ token: TOKEN, info: 1 }) })
+      .then(function(r){ return r.json(); })
+      .then(function(d){
+        if(!d) return;
+        var pk = d.pkgs || (d.pkg3 ? { '3': d.pkg3 } : null);
+        if(!pk) return;
+        Object.keys(pk).forEach(function(id){
+          var v = pk[id]; if(!v) return;
+          var ils = Number(v.ils), credits = Number(v.credits);
+          if(!(ils > 0) || !(credits > 0)) return;
+          var s = STD_PKGS[id];
+          if(s && ils === s.ils && credits === s.credits) return; // standard package for this user — leave card as-is
+          var card = document.querySelector('.card[data-pkg="' + id + '"]');
+          if(!card) return;
+          var coins = card.querySelector('.coins');
+          if(coins){ coins.innerHTML = '<span class="ic">&#9679;</span> ' + credits.toLocaleString('en-US') + ' <small>מטבעות</small>'; }
+          var price = card.querySelector('.price');
+          if(price){ price.innerHTML = '<span class="cur">&#8362;</span>' + ils; }
+          var bonus = card.querySelector('.bonus');
+          if(bonus){ bonus.style.display = 'none'; }
+        });
+      })
+      .catch(function(){});
   }
 
   if(!TOKEN && qp('paid') !== '1'){ document.getElementById('needtoken').style.display = 'block'; }
