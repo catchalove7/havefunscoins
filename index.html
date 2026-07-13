@@ -29,9 +29,11 @@
   .card:hover{transform:translateY(-4px);box-shadow:0 14px 34px rgba(245,166,35,.18)}
   .card.feat{border-color:var(--gold);transform:scale(1.04)}
   .card.feat:hover{transform:scale(1.04) translateY(-4px)}
+  .card.starter{border-color:#10b981}
   .card.sel{border-color:var(--indigo);box-shadow:0 0 0 4px rgba(79,70,229,.16)}
   .badge{position:absolute;top:-12px;left:50%;transform:translateX(-50%);background:var(--indigo);color:#fff;font-size:12px;font-weight:700;padding:5px 14px;border-radius:999px;white-space:nowrap;box-shadow:0 4px 10px rgba(79,70,229,.3)}
   .badge.gold{background:linear-gradient(90deg,var(--gold),var(--amber))}
+  .badge.green{background:linear-gradient(90deg,#10b981,#34d399)}
   .pname{font-size:18px;font-weight:800;margin-bottom:14px;color:var(--muted)}
   .coins{font-size:36px;font-weight:800;color:var(--ink);line-height:1}
   .coins .ic{color:var(--gold)}
@@ -88,42 +90,51 @@
     <div class="notice info" id="needtoken">כדי לטעון מטבעות יש לפתוח עמוד זה דרך החשבון שלך.</div>
 
     <div class="grid">
+      <div class="card starter" data-pkg="6">
+        <div class="badge green">מבצע התחלה 🔥</div>
+        <div class="pname">מבצע התחלה</div>
+        <div class="coins"><span class="ic">&#9679;</span> 800 <small>מטבעות</small></div>
+        <div class="bonus">&#215;2 ברכישה ראשונה = 1,600</div>
+        <div class="price"><span class="cur">&#8362;</span>19</div>
+        <button class="buy" onclick="buy('6',this)">רכישה</button>
+      </div>
+
       <div class="card" data-pkg="1">
         <div class="pname">טעימה</div>
-        <div class="coins"><span class="ic">&#9679;</span> 275 <small>מטבעות</small></div>
-        <div class="bonus">250 + 25 בונוס</div>
+        <div class="coins"><span class="ic">&#9679;</span> 300 <small>מטבעות</small></div>
+        <div class="bonus">275 + 25 בונוס</div>
         <div class="price"><span class="cur">&#8362;</span>25</div>
         <button class="buy" onclick="buy('1',this)">רכישה</button>
       </div>
 
       <div class="card" data-pkg="2">
         <div class="pname">בסיס</div>
-        <div class="coins"><span class="ic">&#9679;</span> 775 <small>מטבעות</small></div>
-        <div class="bonus">750 + 25 בונוס</div>
+        <div class="coins"><span class="ic">&#9679;</span> 700 <small>מטבעות</small></div>
+        <div class="bonus">650 + 50 בונוס</div>
         <div class="price"><span class="cur">&#8362;</span>49</div>
         <button class="buy" onclick="buy('2',this)">רכישה</button>
       </div>
 
-      <div class="card feat" data-pkg="3">
-        <div class="badge">הכי פופולרי</div>
+      <div class="card" data-pkg="3">
         <div class="pname">התחלה</div>
-        <div class="coins"><span class="ic">&#9679;</span> 1,825 <small>מטבעות</small></div>
-        <div class="bonus">1,750 + 75 בונוס</div>
+        <div class="coins"><span class="ic">&#9679;</span> 1,500 <small>מטבעות</small></div>
+        <div class="bonus">1,400 + 100 בונוס</div>
         <div class="price"><span class="cur">&#8362;</span>85</div>
         <button class="buy" onclick="buy('3',this)">רכישה</button>
       </div>
 
-      <div class="card" data-pkg="4">
-        <div class="pname">פרימיום</div>
-        <div class="coins"><span class="ic">&#9679;</span> 4,375 <small>מטבעות</small></div>
-        <div class="bonus">4,250 + 125 בונוס</div>
+      <div class="card feat" data-pkg="4">
+        <div class="badge gold">הכי משתלם</div>
+        <div class="pname">הכי משתלם</div>
+        <div class="coins"><span class="ic">&#9679;</span> 3,750 <small>מטבעות</small></div>
+        <div class="bonus">3,600 + 150 בונוס</div>
         <div class="price"><span class="cur">&#8362;</span>180</div>
         <button class="buy" onclick="buy('4',this)">רכישה</button>
       </div>
 
       <div class="card" data-pkg="5">
-        <div class="badge gold">הכי משתלם</div>
-        <div class="pname">VIP</div>
+        <div class="badge">פרימיום</div>
+        <div class="pname">פרימיום</div>
         <div class="coins"><span class="ic">&#9679;</span> 7,325 <small>מטבעות</small></div>
         <div class="bonus">7,150 + 175 בונוס</div>
         <div class="price"><span class="cur">&#8362;</span>360</div>
@@ -184,6 +195,7 @@
   function errMsg(d){
     var c = d && d.error ? d.error : '';
     if(c === 'unauthorized') return 'פג תוקף הגישה. פתח את העמוד מחדש דרך החשבון שלך.';
+    if(c === 'starter_used') return 'מבצע ההתחלה זמין רק ברכישה הראשונה — בחר חבילה אחרת מהרשימה.';
     if(c === 'bad_package') return 'חבילה לא תקינה.';
     return 'אירעה שגיאה. נסה שוב בעוד רגע.';
   }
@@ -200,6 +212,8 @@
     .then(function(r){ return r.json().then(function(d){ return { ok: r.ok, d: d }; }); })
     .then(function(res){
       if(res.d && res.d.url){ document.getElementById('overlay').style.display = 'flex'; location.href = res.d.url; return; }
+      // starter already used → hide the starter card so the returning buyer picks another package
+      if(res.d && res.d.error === 'starter_used'){ var sc = document.querySelector('.card[data-pkg="6"]'); if(sc){ sc.style.display = 'none'; } document.getElementById('overlay').style.display = 'none'; window.scrollTo(0,0); }
       showErr(errMsg(res.d));
       if(res.d && res.d.error === 'unauthorized'){ document.getElementById('needtoken').style.display = 'block'; }
       if(btn){ btn.disabled = false; btn.textContent = btn.dataset.old || 'רכישה'; }
@@ -213,7 +227,7 @@
   if(qp('canceled') === '1'){ document.getElementById('canceled').style.display = 'block'; }
 
   // highlight a pre-selected package and, if identified, go straight to payment
-  if(PKG && /^[1-5]$/.test(PKG) && qp('paid') !== '1'){
+  if(PKG && /^[1-6]$/.test(PKG) && qp('paid') !== '1'){
     var card = document.querySelector('.card[data-pkg="' + PKG + '"]');
     if(card){ card.classList.add('sel'); }
     if(TOKEN){ document.getElementById('overlay').style.display = 'flex'; buy(PKG, null); }
