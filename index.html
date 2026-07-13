@@ -124,8 +124,8 @@
       <div class="card" data-pkg="5">
         <div class="badge gold">הכי משתלם</div>
         <div class="pname">VIP</div>
-        <div class="coins"><span class="ic">&#9679;</span> 9,675 <small>מטבעות</small></div>
-        <div class="bonus">9,500 + 175 בונוס</div>
+        <div class="coins"><span class="ic">&#9679;</span> 7,325 <small>מטבעות</small></div>
+        <div class="bonus">7,150 + 175 בונוס</div>
         <div class="price"><span class="cur">&#8362;</span>360</div>
         <button class="buy" onclick="buy('5',this)">רכישה</button>
       </div>
@@ -217,34 +217,6 @@
     var card = document.querySelector('.card[data-pkg="' + PKG + '"]');
     if(card){ card.classList.add('sel'); }
     if(TOKEN){ document.getElementById('overlay').style.display = 'flex'; buy(PKG, null); }
-  }
-
-  // If this user has custom (per-user) package amounts, reflect them in the cards so what's shown == what's charged.
-  var STD_PKGS = { '1':{ils:25,credits:275}, '2':{ils:49,credits:775}, '3':{ils:85,credits:1825}, '4':{ils:180,credits:4375}, '5':{ils:360,credits:9675} };
-  if(TOKEN && qp('paid') !== '1'){
-    fetch(API, { method:'POST', headers:{ 'Content-Type':'application/json', 'apikey': ANON, 'Authorization': 'Bearer ' + ANON }, body: JSON.stringify({ token: TOKEN, info: 1 }) })
-      .then(function(r){ return r.json(); })
-      .then(function(d){
-        if(!d) return;
-        var pk = d.pkgs || (d.pkg3 ? { '3': d.pkg3 } : null);
-        if(!pk) return;
-        Object.keys(pk).forEach(function(id){
-          var v = pk[id]; if(!v) return;
-          var ils = Number(v.ils), credits = Number(v.credits);
-          if(!(ils > 0) || !(credits > 0)) return;
-          var s = STD_PKGS[id];
-          if(s && ils === s.ils && credits === s.credits) return; // standard package for this user — leave card as-is
-          var card = document.querySelector('.card[data-pkg="' + id + '"]');
-          if(!card) return;
-          var coins = card.querySelector('.coins');
-          if(coins){ coins.innerHTML = '<span class="ic">&#9679;</span> ' + credits.toLocaleString('en-US') + ' <small>מטבעות</small>'; }
-          var price = card.querySelector('.price');
-          if(price){ price.innerHTML = '<span class="cur">&#8362;</span>' + ils; }
-          var bonus = card.querySelector('.bonus');
-          if(bonus){ bonus.style.display = 'none'; }
-        });
-      })
-      .catch(function(){});
   }
 
   if(!TOKEN && qp('paid') !== '1'){ document.getElementById('needtoken').style.display = 'block'; }
